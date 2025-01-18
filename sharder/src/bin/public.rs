@@ -61,8 +61,8 @@ async fn run(config: Config) -> Result<()> {
         token: Box::from(config.sharder_token.clone()),
         shard_count,
         presence: StatusUpdate::new(
-            ActivityType::Listening,
-            "/help".to_owned(),
+            ActivityType::Playing,
+            "MINIPLAYS.DE".to_owned(),
             StatusType::Online,
         ),
         large_sharding_buckets: config.large_sharding_buckets,
