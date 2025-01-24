@@ -44,7 +44,7 @@ jobs:
 
       - name: Set image name
         run: |
-          echo "IMAGE_NAME=${REGISTRY}/${GITHUB_REPOSITORY_OWNER,,}/${PACKAGE_NAME,,}:${GITHUB_SHA}" >> ${GITHUB_ENV}
+          echo "IMAGE_NAME=${REGISTRY}/${GITHUB_REPOSITORY_OWNER,,}/${PACKAGE_NAME,,}" >> ${GITHUB_ENV}
         env:
           PACKAGE_NAME: ${{ matrix.package }}
 
@@ -52,21 +52,21 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE_NAME }} 
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+        env:
+          DOCKER_METADATA_SHORT_SHA_LENGTH: 20
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
-
         with:
           context: .
           file: ${{ matrix.dockerfile }}
           push: true
-          tags: ${{ env.IMAGE_NAME }}
+          tags: ${{ sgeps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Log image name
-        run: |
-          echo "Image URI: ${IMAGE_NAME}"
